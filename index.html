@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,27 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>easyPCS</title>
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="icon.png" sizes="512x512">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="easyPCS">
-  <style>html,body{height:100%;}</style>
-  <link rel="stylesheet" href="style.css?v=fix2">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar" role="banner">
-    <h1 class="brand">easy<span>PCS</span></h1>
-    <button class="pill reset-btn" aria-label="Reset data">Reset</button>
+  <header class="app-header">
+    <h1 class="brand"><span>easy</span><strong>PCS</strong></h1>
+    <button id="btnReset" class="pill">Reset</button>
   </header>
 
-  <main id="view" role="main" aria-live="polite"></main>
+  <main id="app" class="content" aria-live="polite">
+    <!-- rendered by script.js -->
+  </main>
 
-  <nav class="bottom-nav" role="navigation" aria-label="Primary">
-    <button class="nav-btn" data-route="#/home" aria-label="Home">🏠<span>Home</span></button>
-    <button id="addFab" class="nav-btn primary" aria-label="Add">＋</button>
-    <button class="nav-btn" data-route="#/timeline" aria-label="Timeline">⏱️<span>Timeline</span></button>
+  <nav class="bottom-bar" role="navigation" aria-label="Primary">
+    <button id="navHome" class="nav-btn" aria-label="Home">🏠<span>Home</span></button>
+    <button id="navAdd" class="nav-btn primary" aria-label="Add">+</button>
+    <button id="navTimeline" class="nav-btn" aria-label="Timeline">⏱️<span>Timeline</span></button>
   </nav>
 
-  <script src="script.js?v=fix2"></script>
+  <script src="script.js"></script>
 </body>
 </html>
