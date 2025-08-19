@@ -2,110 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>easyPCS</title>
-  <meta name="theme-color" content="#0B1020">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>easyPCS — Test Harness</title>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;margin:0;background:#0b1020;color:#e6eaf5}
+    header,footer{position:sticky;left:0;right:0;background:#121a2c;padding:12px 16px;z-index:2}
+    header{top:0}footer{bottom:0}
+    .bar{display:flex;align-items:center;gap:12px}
+    .grow{flex:1}
+    #phases{padding:16px;display:grid;grid-template-columns:1fr;gap:12px}
+    .phase-card{background:#121a2c;border:1px solid #20283a;border-radius:14px;padding:12px}
+    .phase-card h3{margin:0 0 8px;font-size:16px}
+    .task-list{margin:0;padding-left:18px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid #20283a;background:#2f6bff;color:#fff;font-weight:600}
+    .add-task-btn{margin-top:8px}
+  </style>
 </head>
 <body>
-  <!-- Top App Bar -->
-  <header class="topbar" role="banner">
-    <div class="brand" aria-label="App title">easy<span>PCS</span></div>
-    <button class="icon-btn" id="btnMenu" aria-label="Menu" title="Menu" aria-haspopup="true" aria-controls="menu">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-    </button>
-    <div id="menu" class="menu" role="menu" hidden>
-      <button role="menuitem" id="actionReset">Reset data</button>
-      <button role="menuitem" id="actionAbout">About</button>
+  <header>
+    <div class="bar">
+      <strong>easyPCS (test)</strong>
+      <span class="grow"></span>
+      <button id="addPhaseBtn" class="btn" type="button">+ Add Phase</button>
     </div>
   </header>
 
-  <main id="app" role="main">
-    <!-- Home / Phase Carousel -->
-    <section id="viewHome" class="view active" aria-labelledby="homeHeading">
-      <h1 id="homeHeading" class="sr-only">Phases</h1>
-      <div class="phase-carousel" id="phaseCarousel" aria-label="Phase carousel"></div>
-      <div class="dots" id="carouselDots" role="tablist" aria-label="Phase selector"></div>
-    </section>
+  <main id="phases" aria-live="polite"></main>
 
-    <!-- Phase Detail -->
-    <section id="viewPhase" class="view" aria-labelledby="phaseHeading">
-      <div class="phase-header">
-        <button id="btnBack" class="icon-btn" aria-label="Back to Home" title="Back">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-        </button>
-        <input id="phaseTitleInput" class="phase-title-input" aria-label="Phase title" />
-        <button id="btnDeletePhase" class="icon-btn danger" aria-label="Delete phase" title="Delete phase">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12M9 7v11m6-11v11M4 7h16l-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 7zm4-3h8l1 3H7l1-3z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
-        </button>
-      </div>
+  <footer>
+    <div class="bar"><span class="grow"></span><small>This is a minimal test page to verify script.js runs.</small><span class="grow"></span></div>
+  </footer>
 
-      <div id="taskLists" class="task-lists" role="list">
-        <h2 class="section-label">Active</h2>
-        <div id="activeList" class="task-list" aria-label="Active tasks"></div>
-
-        <details id="completedBlock" class="completed-block">
-          <summary><span id="completedLabel">Completed</span></summary>
-          <div id="completedList" class="task-list completed" aria-label="Completed tasks"></div>
-        </details>
-
-        <div id="emptyPhase" class="empty" hidden>No tasks yet. Use ＋ to add one.</div>
-      </div>
-
-      <!-- Add Task (phase-scoped, no modal on home) -->
-      <form id="addTaskForm" class="add-form" aria-label="Add task">
-        <div class="fields">
-          <label class="sr-only" for="taskTitle">Title</label>
-          <input id="taskTitle" class="input" maxlength="60" placeholder="Task title (required)" required>
-          <label class="sr-only" for="taskDue">Due date</label>
-          <input id="taskDue" class="input" type="date">
-          <label class="sr-only" for="taskDesc">Description</label>
-          <textarea id="taskDesc" class="input" rows="2" maxlength="180" placeholder="Optional description"></textarea>
-        </div>
-        <button type="submit" class="btn primary">＋ Add Task</button>
-      </form>
-    </section>
-
-    <!-- Timeline -->
-    <section id="viewTimeline" class="view" aria-labelledby="timelineHeading">
-      <h1 id="timelineHeading" class="sr-only">Master Timeline</h1>
-
-      <div class="calendar" id="calendar"></div>
-
-      <div class="timeline-header">
-        <div class="filters" role="tablist" aria-label="Timeline Filters">
-          <button class="chip active" data-filter="all">All</button>
-          <button class="chip" data-filter="Pre‑Departure">Pre‑Departure</button>
-          <button class="chip" data-filter="Mid Prep">Mid Prep</button>
-          <button class="chip" data-filter="Final Out">Final Out</button>
-          <button class="chip" data-filter="Arrival (Hill AFB)">Arrival</button>
-        </div>
-      </div>
-
-      <div id="timelineList" class="timeline-list" role="list"></div>
-    </section>
-  </main>
-
-  <!-- Bottom Navigation -->
-  <nav class="bottom-nav" role="navigation" aria-label="Primary">
-    <button class="nav-btn" id="navHome" aria-label="Home">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10l9-7 9 7v8a2 2 0 0 1-2 2h-4v-6H9v6H5a2 2 0 0 1-2-2v-8z" fill="currentColor"/></svg>
-      <span class="label">Home</span>
-    </button>
-    <button class="nav-btn primary" id="navAdd" aria-label="Add Task">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <span class="label">Add</span>
-    </button>
-    <button class="nav-btn" id="navTimeline" aria-label="Timeline">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18M8 3v4M16 3v4M3 11h18M3 19h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <span class="label">Timeline</span>
-    </button>
-  </nav>
-
-  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-
-  <script src="script.js" defer></script>
+  <script src="./script.js"></script>
 </body>
 </html>
