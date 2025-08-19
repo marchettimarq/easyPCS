@@ -1,72 +1,26 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>easyPCS</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="stylesheet" href="style.css"/>
-</head>
-<body>
-  <header class="appbar" role="banner">
-    <div class="brand">easy<span>PCS</span></div>
-    <div class="appbar-actions">
-      <button id="btnReset" class="ghost" aria-label="Reset to seed">Reset</button>
-      <button id="btnMenu" class="icon-btn" aria-label="Menu" title="Menu">⋯</button>
-    </div>
-  </header>
+  <head>
+    <meta charset="utf-8">
+    <title>easyPCS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="app-header">
+      <h1 class="app-title">easy<span class="brand">PCS</span></h1>
+      <button id="resetBtn" class="reset">Reset</button>
+    </header>
 
-  <!-- Home / Carousel -->
-  <main id="viewHome" class="view" role="main">
-    <div class="carousel" id="carousel" aria-label="Phases"></div>
-    <div id="pager" class="pager" aria-hidden="true"></div>
-  </main>
+    <main id="app" aria-live="polite"></main>
 
-  <!-- Timeline -->
-  <main id="viewTimeline" class="view hidden" role="main">
-    <h2 class="section-title">Master Timeline</h2>
-    <div id="timelineList" class="timeline"></div>
-  </main>
+    <nav class="bottom-bar" role="navigation" aria-label="Primary">
+      <button id="navHome" class="nav-btn" aria-label="Home">🏠<span>Home</span></button>
+      <button id="navAdd" class="nav-btn primary" aria-label="Add">＋<span>Add</span></button>
+      <button id="navTimeline" class="nav-btn" aria-label="Timeline">⏱️<span>Timeline</span></button>
+    </nav>
 
-  <nav class="bottom-nav" role="navigation" aria-label="Primary">
-    <button id="navHome" class="nav-btn" aria-label="Home">
-      <div class="icon">🏠</div><div class="lbl">Home</div>
-    </button>
-    <button id="navAdd" class="nav-btn primary" aria-label="Add">
-      <div class="icon">＋</div><div class="lbl">Add</div>
-    </button>
-    <button id="navTimeline" class="nav-btn" aria-label="Timeline">
-      <div class="icon">⏱️</div><div class="lbl">Timeline</div>
-    </button>
-  </nav>
-
-  <!-- Simple add form (per current card) -->
-  <div id="sheet" class="sheet hidden" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-    <div class="sheet-card">
-      <div class="sheet-head">
-        <h3 id="sheetTitle">Add Task</h3>
-      </div>
-      <form id="addTaskForm">
-        <label>Title
-          <input id="taskTitle" name="title" type="text" placeholder="e.g., Book pet travel" required maxlength="120"/>
-        </label>
-        <label>Due date
-          <input id="taskDue" name="due" type="date" />
-        </label>
-        <label>Details (optional)
-          <textarea id="taskDesc" name="desc" rows="3" maxlength="500" placeholder="Notes, links, specifics"></textarea>
-        </label>
-        <div class="sheet-actions">
-          <button type="button" id="cancelAdd" class="ghost">Cancel</button>
-          <button type="submit" class="primary">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
