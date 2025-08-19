@@ -1,13 +1,12 @@
 
-// easyPCS minimal SPA (patch build)
-// - Safe-area header fix
-// - Tappable phase cards -> #/phase/:id
-// - Task rows expand to show description
-// - Active/Completed lists without disappearing tasks
+// easyPCS vertical phases build (collapsible).
+// - Stacked vertical phase blocks (no horizontal scroll).
+// - Tap a phase header to expand/collapse tasks.
+// - Task rows expand to show description via chevron.
+// - Active/Completed lists with stable rendering (no disappearing tasks).
 
 const LS_KEY = 'easyPCS';
 
-// --- Seed data (short but realistic) ---
 function seedData(){
   return {
     phases:[
@@ -36,30 +35,25 @@ function seedData(){
 }
 
 // --- State ---
-let app = null;
+let app=null;
 function load(){
   const raw = localStorage.getItem(LS_KEY);
-  if(!raw){ app = seedData(); save(true); return; }
-  try{ app = JSON.parse(raw); }catch(e){ app = seedData(); save(true); }
+  if(!raw){ app=seedData(); save(true); return; }
+  try{ app = JSON.parse(raw); }catch(e){ app=seedData(); save(true); }
 }
 let saveTimer=null;
 function save(immediate=false){
-  const doSave = ()=>localStorage.setItem(LS_KEY, JSON.stringify(app));
+  const doSave=()=>localStorage.setItem(LS_KEY, JSON.stringify(app));
   if(immediate){ doSave(); return; }
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(doSave, 180);
+  clearTimeout(saveTimer); saveTimer = setTimeout(doSave, 180);
 }
 
 // --- Routing ---
 function route(){
-  const hash = location.hash || '#/home';
+  const h = location.hash || '#/home';
   if(!location.hash) history.replaceState(null,'','#/home');
-  if(hash.startsWith('#/home')) renderHome();
-  else if(hash.startsWith('#/phase/')){
-    const id = hash.split('/')[2];
-    const phase = app.phases.find(p=>p.id===id);
-    renderPhaseView(phase || app.phases[0]);
-  } else if(hash.startsWith('#/timeline')) renderTimeline();
+  if(h.startsWith('#/home')) renderHome();
+  else if(h.startsWith('#/timeline')) renderTimeline();
 }
 
 // --- Helpers ---
@@ -71,59 +65,54 @@ function nextDate(p){
   const upcoming = p.tasks.filter(t=>!t.done && t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
   return upcoming ? upcoming.due : '';
 }
+function elEmpty(){ const e=document.createElement('div'); e.className='empty'; e.textContent='Nothing here yet.'; return e; }
 
-// --- Render: Home (phase carousel) ---
+// --- Render Home as vertical stack ---
 function renderHome(){
   appNode.innerHTML='';
-  const wrap = document.createElement('div');
-  wrap.className='phase-carousel';
-  app.phases.forEach(p=>wrap.appendChild(renderPhaseCard(p)));
-  appNode.appendChild(wrap);
-}
-function renderPhaseCard(phase){
-  const card = document.createElement('article');
-  card.className='phase-card';
-  card.tabIndex=0;
-  card.dataset.phaseId = phase.id;
-  card.innerHTML = `
-    <h3>${escapeHtml(phase.title)}</h3>
-    <div class="bar"><span style="width:${pctDone(phase)}%"></span></div>
-    <div class="meta">${doneCount(phase)}/${phase.tasks.length} complete • Next: ${nextDate(phase) || '—'}</div>
-  `;
-  card.addEventListener('click', ()=>{ location.hash = '#/phase/'+phase.id; });
-  card.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); location.hash='#/phase/'+phase.id; }});
-  return card;
+  const stack = document.createElement('div'); stack.className='phase-stack';
+  app.phases.forEach(p=> stack.appendChild(renderPhaseBlock(p)));
+  appNode.appendChild(stack);
 }
 
-// --- Render: Phase view (tasks) ---
-function renderPhaseView(phase){
-  if(!phase){ appNode.innerHTML='<p class="empty">No phases.</p>'; return; }
-  appNode.innerHTML='';
-  const h = document.createElement('h2');
-  h.textContent = phase.title;
-  appNode.appendChild(h);
+function renderPhaseBlock(phase){
+  const block = document.createElement('section'); block.className='phase-block';
+  // default expanded; if you want default collapsed, add 'collapsed' here
+  const head = document.createElement('div'); head.className='phase-head'; head.setAttribute('role','button'); head.tabIndex=0;
+  const name = document.createElement('h3'); name.className='phase-name'; name.textContent = phase.title;
+  const meta = document.createElement('div'); meta.className='meta'; meta.textContent = `${doneCount(phase)}/${phase.tasks.length} • Next: ${nextDate(phase)||'—'}`;
+  head.appendChild(name); head.appendChild(meta);
+  const bar = document.createElement('div'); bar.className='bar'; const barInner=document.createElement('span'); barInner.style.width=pctDone(phase)+'%'; bar.appendChild(barInner);
 
+  // body with lists
+  const body = document.createElement('div'); body.className='phase-body';
   const active = phase.tasks.filter(t=>!t.done).sort((a,b)=>(a.due||'').localeCompare(b.due||''));
   const completed = phase.tasks.filter(t=>t.done).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
 
-  const sectionA = document.createElement('section'); sectionA.className='section';
-  sectionA.innerHTML='<h4>Active</h4>';
+  const sectionA=document.createElement('section'); sectionA.className='section'; sectionA.innerHTML='<h4>Active</h4>';
   if(active.length===0) sectionA.appendChild(elEmpty());
   else active.forEach(t=>{ const [row,desc]=renderTaskRow(phase.id,t); sectionA.appendChild(row); sectionA.appendChild(desc); });
-  appNode.appendChild(sectionA);
 
-  const sectionC = document.createElement('section'); sectionC.className='section';
-  sectionC.innerHTML='<h4>Completed</h4>';
+  const sectionC=document.createElement('section'); sectionC.className='section'; sectionC.innerHTML='<h4>Completed</h4>';
   if(completed.length===0) sectionC.appendChild(elEmpty());
   else completed.forEach(t=>{ const [row,desc]=renderTaskRow(phase.id,t); sectionC.appendChild(row); sectionC.appendChild(desc); });
-  appNode.appendChild(sectionC);
+
+  body.appendChild(sectionA); body.appendChild(sectionC);
+
+  // toggle collapse
+  head.addEventListener('click', ()=>{
+    block.classList.toggle('collapsed');
+  });
+  head.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' || e.key===' '){ e.preventDefault(); block.classList.toggle('collapsed'); }
+  });
+
+  block.appendChild(head); block.appendChild(bar); block.appendChild(body);
+  return block;
 }
-function elEmpty(){ const e=document.createElement('div'); e.className='empty'; e.textContent='Nothing here yet.'; return e; }
 
 function renderTaskRow(phaseId, task){
-  const row = document.createElement('div');
-  row.className='task-row';
-  row.dataset.taskId = task.id;
+  const row = document.createElement('div'); row.className='task-row'; row.dataset.taskId=task.id;
   row.innerHTML = `
     <label class="check">
       <input type="checkbox" ${task.done?'checked':''} aria-label="Mark complete">
@@ -131,13 +120,11 @@ function renderTaskRow(phaseId, task){
     </label>
     <div class="task-main">
       <div class="task-title">${escapeHtml(task.title)}</div>
-      <div class="task-date">${task.due || ''}</div>
+      <div class="task-date">${task.due||''}</div>
     </div>
     <button class="chev" aria-label="Show details">▾</button>
   `;
-  const details = document.createElement('div');
-  details.className='task-desc';
-  details.textContent = task.desc || 'No additional details.';
+  const desc = document.createElement('div'); desc.className='task-desc'; desc.textContent = task.desc || 'No additional details.';
 
   // events
   row.querySelector('input').addEventListener('change', (e)=>{
@@ -146,48 +133,43 @@ function renderTaskRow(phaseId, task){
     t.done = e.target.checked;
     t.completedAt = t.done ? Date.now() : null;
     save();
-    renderPhaseView(phase); // re-render both sections
-    // also update progress bar if user goes home later (no-op here)
+    renderHome(); // re-render all so progress/meta update
   });
   row.querySelector('.chev').addEventListener('click', (e)=>{
     e.stopPropagation();
     row.classList.toggle('expanded');
   });
 
-  return [row, details];
+  return [row, desc];
 }
 
-// --- Render: Timeline (simple grouped list) ---
+// --- Timeline (simple) ---
 function renderTimeline(){
   appNode.innerHTML='<h2>Master Timeline</h2>';
   const list = [...app.timeline];
-  // add all tasks that have a date
   app.phases.forEach(p=>p.tasks.forEach(t=>{ if(t.due) list.push({date:t.due, title:`${p.title}: ${t.title}`, phase:p.title, done:t.done}); }));
   list.sort((a,b)=>a.date.localeCompare(b.date));
 
-  let currentMonth='';
+  let current='';
   list.forEach(item=>{
     const month = new Date(item.date+'T12:00:00').toLocaleString(undefined,{month:'long',year:'numeric'});
-    if(month!==currentMonth){
-      currentMonth=month;
-      const h=document.createElement('h4');h.className='section';h.textContent=month;appNode.appendChild(h);
-    }
-    const card=document.createElement('article');card.className='phase-card';card.style.minWidth='auto';
-    card.innerHTML = `<div class="meta">${item.date}</div><h3>${escapeHtml(item.title)}</h3>`;
+    if(month!==current){ current=month; const h=document.createElement('h4');h.className='section';h.textContent=month;appNode.appendChild(h); }
+    const card=document.createElement('article');card.className='phase-block';
+    const head=document.createElement('div');head.className='phase-head';const n=document.createElement('h3');n.className='phase-name';n.textContent=item.title; const m=document.createElement('div');m.className='meta';m.textContent=item.date; head.appendChild(n); head.appendChild(m);
+    card.appendChild(head);
     appNode.appendChild(card);
   });
 }
 
-// --- Nav buttons ---
+// --- Nav ---
 document.getElementById('navHome').addEventListener('click', ()=>location.hash='#/home');
 document.getElementById('navTimeline').addEventListener('click', ()=>location.hash='#/timeline');
 document.getElementById('navAdd').addEventListener('click', ()=>{
-  // Minimal: add a blank task to current phase (first) to keep patch small
+  // add a new task to the first phase as a simple demo
   const phase = app.phases[0];
-  const id = 't'+Date.now();
-  phase.tasks.unshift({id, title:'New task', due:'', desc:'', done:false, completedAt:null});
+  phase.tasks.unshift({id:'t'+Date.now(), title:'New task', due:'', desc:'', done:false, completedAt:null});
   save();
-  location.hash = '#/phase/'+phase.id;
+  location.hash='#/home';
 });
 document.getElementById('resetBtn').addEventListener('click', ()=>{
   if(confirm('Reset app data?')){ localStorage.removeItem(LS_KEY); load(); route(); }
