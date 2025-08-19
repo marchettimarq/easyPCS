@@ -5,17 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>easyPCS — Test Harness</title>
   <style>
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;margin:0;background:#0b1020;color:#e6eaf5}
-    header,footer{position:sticky;left:0;right:0;background:#121a2c;padding:12px 16px;z-index:2}
-    header{top:0}footer{bottom:0}
+    :root{--bg:#0b1020;--card:#121a2c;--text:#e6eaf5;--muted:#9aa7c7;--border:#20283a;--brand:#2f6bff;}
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+    header,footer{position:sticky;left:0;right:0;background:var(--card);padding:12px 16px;z-index:2;border-bottom:1px solid var(--border)}
+    header{top:0}
+    footer{bottom:0;border-top:1px solid var(--border);border-bottom:none}
     .bar{display:flex;align-items:center;gap:12px}
     .grow{flex:1}
     #phases{padding:16px;display:grid;grid-template-columns:1fr;gap:12px}
-    .phase-card{background:#121a2c;border:1px solid #20283a;border-radius:14px;padding:12px}
+    .phase-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
     .phase-card h3{margin:0 0 8px;font-size:16px}
     .task-list{margin:0;padding-left:18px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid #20283a;background:#2f6bff;color:#fff;font-weight:600}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--brand);color:#fff;font-weight:600}
     .add-task-btn{margin-top:8px}
+    .notice{padding:12px 16px;background:#101628;border-top:1px solid var(--border);color:var(--muted);text-align:center}
   </style>
 </head>
 <body>
@@ -28,11 +32,13 @@
   </header>
 
   <main id="phases" aria-live="polite"></main>
+  <div class="notice">This is a minimal test page to verify <code>script.js</code> runs.</div>
 
   <footer>
-    <div class="bar"><span class="grow"></span><small>This is a minimal test page to verify script.js runs.</small><span class="grow"></span></div>
+    <div class="bar"><span class="grow"></span><small>Footer placeholder</small><span class="grow"></span></div>
   </footer>
 
-  <script src="./script.js"></script>
+  <!-- Make sure this script tag is at the very end of body -->
+  <script src="script.js"></script>
 </body>
 </html>
