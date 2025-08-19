@@ -1,23 +1,9 @@
 
-/* easyPCS - minimal vertical phases + working routing + reset + full seed
-   - Always route to #/home
-   - Render vertical phase cards (collapsed by default)
-   - Toggle tasks between Active/Completed without dropping list
-   - Timeline view
-*/
+// easyPCS – final build with full seed, add/delete tasks, reset, vertical phases
+const LS_KEY = 'easyPCS';
 
-const LS_KEY = "easyPCS";
-
-// Ensure we always land on #/home
-function ensureHomeRoute() {
-  if (!location.hash || location.hash === "#") {
-    location.replace("#/home");
-  }
-}
-ensureHomeRoute();
-
-/* ---------- Seed Data (full) ---------- */
-function seedData() {
+/* ---------- Seed data ---------- */
+function seedData(){
   const data = {
     phases: [
       {
@@ -38,14 +24,7 @@ function seedData() {
           {"id":"p1t11","title":"If carrying firearms, record POF details (Make/Model/Serial)","due":"2025-09-23","desc":"","done":false,"completedAt":null},
           {"id":"p1t12","title":"(Optional) Sign AOI Acknowledgement Memo","due":"2025-09-01","desc":"","done":false,"completedAt":null},
           {"id":"p1t13","title":"(Optional) Upload Assignment Worksheet, medical clearance initiation screenshot, DD1172-2","due":"2025-09-01","desc":"","done":false,"completedAt":null},
-          {"id":"p1t14","title":"(Optional) Use AOI orders for HHG/Passenger Travel scheduling — cannot depart without amendment validating FMTS/security clearance","due":"2025-09-10","desc":"","done":false,"completedAt":null},
-          {"id":"p1t15","title":"Book pet transport if flying","due":"2025-09-20","desc":"","done":false,"completedAt":null},
-          {"id":"p1t16","title":"Schedule vet appointment for 3 cats (checkups, vaccines)","due":"2025-09-05","desc":"","done":false,"completedAt":null},
-          {"id":"p1t17","title":"Decide car plan: sell, ship, or drive","due":"2025-08-25","desc":"","done":false,"completedAt":null},
-          {"id":"p1t18","title":"Start yard sales / donate items","due":"2025-09-15","desc":"","done":false,"completedAt":null},
-          {"id":"p1t19","title":"Start car sale prep (detailing, photos, title/lien)","due":"2025-09-18","desc":"","done":false,"completedAt":null},
-          {"id":"p1t20","title":"Plan Sperrmüll pickup (book a slot 30 days out)","due":"2025-09-28","desc":"","done":false,"completedAt":null},
-          {"id":"p1t21","title":"Book temporary lodging at Hill (TLF)","due":"2025-10-05","desc":"","done":false,"completedAt":null}
+          {"id":"p1t14","title":"(Optional) Use AOI orders for HHG/Passenger Travel scheduling — cannot depart without amendment validating FMTS/security clearance","due":"2025-09-10","desc":"","done":false,"completedAt":null}
         ]
       },
       {
@@ -66,10 +45,7 @@ function seedData() {
           {"id":"p2t11","title":"Physical Fitness valid through 2026‑01‑31 (retest if due)","due":"2025-11-15","desc":"","done":false,"completedAt":null},
           {"id":"p2t12","title":"Orders Review — dependents, RNLTD, remarks","due":"2025-11-10","desc":"","done":false,"completedAt":null},
           {"id":"p2t13","title":"Household Goods (TMO) — after orders/AOI, schedule pack‑out","due":"2025-11-05","desc":"","done":false,"completedAt":null},
-          {"id":"p2t14","title":"If traveling different routing: submit Circuitous Travel Memo","due":"2025-11-12","desc":"","done":false,"completedAt":null},
-          {"id":"p2t15","title":"Schedule HHG pre‑inspection","due":"2025-10-20","desc":"","done":false,"completedAt":null},
-          {"id":"p2t16","title":"Confirm school records/transcripts for dependents","due":"2025-10-25","desc":"","done":false,"completedAt":null},
-          {"id":"p2t17","title":"Request medical/dental records for family","due":"2025-10-25","desc":"","done":false,"completedAt":null}
+          {"id":"p2t14","title":"If traveling different routing: submit Circuitous Travel Memo","due":"2025-11-12","desc":"","done":false,"completedAt":null}
         ]
       },
       {
@@ -80,13 +56,7 @@ function seedData() {
           {"id":"p3t1","title":"CSS Outprocessing — 1 duty day before MPF","due":"2025-12-18","desc":"","done":false,"completedAt":null},
           {"id":"p3t2","title":"Final Out Appointment (MPF) — WaitWhile; bring all docs","due":"2025-12-19","desc":"Checklist: PCS Orders (verified), Certified SOES/SGLI, 2× Relocation Memos (signed), vOP Checklist (all cleared), Immunizations Memo, Security Clearance Memo","done":false,"completedAt":null},
           {"id":"p3t3","title":"Port Call (Passenger Travel) — upload orders to PTA, confirm flight","due":"2025-12-10","desc":"","done":false,"completedAt":null},
-          {"id":"p3t4","title":"Finance Outprocessing (CPTS) — DLA, travel voucher, GTC usage","due":"2025-12-19","desc":"","done":false,"completedAt":null},
-          {"id":"p3t5","title":"Pack PCS docs in carry‑on","due":"2025-12-15","desc":"","done":false,"completedAt":null},
-          {"id":"p3t6","title":"Close Ramstein PO Box","due":"2025-12-16","desc":"","done":false,"completedAt":null},
-          {"id":"p3t7","title":"Sperrmüll pickup for final disposals","due":"2025-12-12","desc":"","done":false,"completedAt":null},
-          {"id":"p3t8","title":"Car insurance switched for Utah (if shipping/driving)","due":"2025-12-17","desc":"","done":false,"completedAt":null},
-          {"id":"p3t9","title":"Clean housing for final inspection","due":"2025-12-17","desc":"","done":false,"completedAt":null},
-          {"id":"p3t10","title":"Complete pet health certificate (within 10 days of flight)","due":"2025-12-14","desc":"","done":false,"completedAt":null}
+          {"id":"p3t4","title":"Finance Outprocessing (CPTS) — DLA, travel voucher, GTC usage","due":"2025-12-19","desc":"","done":false,"completedAt":null}
         ]
       },
       {
@@ -99,18 +69,13 @@ function seedData() {
           {"id":"p4t3","title":"In‑process Medical at Hill AFB Clinic","due":"2026-01-05","desc":"","done":false,"completedAt":null},
           {"id":"p4t4","title":"Update DEERS/Tricare with new address","due":"2026-01-06","desc":"","done":false,"completedAt":null},
           {"id":"p4t5","title":"Secure housing (on/off base)","due":"2026-01-15","desc":"","done":false,"completedAt":null},
-          {"id":"p4t6","title":"School/childcare enrollment for dependents","due":"2026-01-10","desc":"","done":false,"completedAt":null},
-          {"id":"p4t7","title":"Register pets at Hill Vet Clinic","due":"2026-01-07","desc":"","done":false,"completedAt":null}
+          {"id":"p4t6","title":"School/childcare enrollment for dependents","due":"2026-01-10","desc":"","done":false,"completedAt":null}
         ]
       }
     ],
     timeline: [
-      {"date":"2025-07-15","title":"Assignment RIP issued","phase":null,"done":true},
-      {"date":"2025-08-10","title":"Pre‑Departure: Review PCS RIP and assignment details.","phase":"Pre‑Departure","done":false},
-      {"date":"2025-08-15","title":"Initial Briefing complete; begin medical/security","phase":"Pre‑Departure","done":true},
-      {"date":"2025-08-15","title":"Pre‑Departure: Complete Initial Assignment Briefing (vMPF).","phase":"Pre‑Departure","done":true},
-      {"date":"2025-08-25","title":"Personal: Decide car plan: sell, ship, or drive.","phase":"Pre‑Departure","done":false},
-      {"date":"2025-08-25","title":"Pre‑Departure: Schedule immunizations clinic appointment.","phase":"Pre‑Departure","done":false},
+      {"date":"2025-07-15","title":"Assignment notification RIP issued","phase":null,"done":true},
+      {"date":"2025-08-15","title":"Initial Assignment Briefing complete; begin medical/security/immunizations","phase":"Pre‑Departure","done":true},
       {"date":"2025-09-23","title":"Document suspense — AW, DD1172‑2, FMTS/ITSQ, Immunizations, Security Memo, Retainability memo uploaded","phase":"Pre‑Departure","done":false},
       {"date":"2025-10-15","title":"Follow up FMTS clearance; VIPER folder check","phase":"Mid Prep","done":false},
       {"date":"2025-11-15","title":"Relocation Memo routing, vOP, fitness test if due. Schedule HHG. Circuitous Travel if needed.","phase":"Mid Prep","done":false},
@@ -119,203 +84,192 @@ function seedData() {
       {"date":"2025-12-19","title":"MPF Final Out appointment","phase":"Final Out","done":false},
       {"date":"2025-12-22","title":"Projected Departure","phase":"Final Out","done":false},
       {"date":"2026-01-31","title":"Report to Hill AFB by RNLTD 31 Jan; in‑process unit, finance, housing, medical","phase":"Arrival (Hill AFB)","done":false}
-    ]
+    ],
+    ui: { collapsed: {} }
   };
+  // collapsed by default
+  data.phases.forEach(p => data.ui.collapsed[p.id] = true);
   localStorage.setItem(LS_KEY, JSON.stringify(data));
   return data;
 }
 
-function loadState(){
-  const raw = localStorage.getItem(LS_KEY);
-  if(!raw){ return seedData(); }
-  try{ return JSON.parse(raw); }catch(e){ console.warn("State parse failed, reseeding",e); return seedData(); }
+/* ---------- Safe load / init ---------- */
+function safeLoad(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.phases) || parsed.phases.length===0) return null;
+    if(!parsed.ui) parsed.ui = { collapsed: {} };
+    return parsed;
+  }catch(e){ return null; }
 }
-let state = loadState();
 
-// Debounced save
-let saveTimer=null;
-function saveState(){
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(()=>localStorage.setItem(LS_KEY, JSON.stringify(state)), 180);
+let app = safeLoad() ?? seedData();
+
+const save = debounce(()=> localStorage.setItem(LS_KEY, JSON.stringify(app)), 180);
+function debounce(fn, ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms);}}
+
+/* ---------- Router ---------- */
+window.addEventListener('hashchange', route);
+function route(){
+  const hash = location.hash || '#/home';
+  if(!location.hash) location.replace('#/home');
+  if(hash.startsWith('#/timeline')) renderTimeline();
+  else renderHome();
 }
 
 /* ---------- Helpers ---------- */
-const byDue = (a,b)=> (a.due||"9999-12-31").localeCompare(b.due||"9999-12-31");
-const byCompletedAtDesc = (a,b)=> (b.completedAt||0) - (a.completedAt||0);
-function fmtNextDue(tasks){
-  const upcoming = tasks.filter(t=>!t.done && t.due).sort(byDue)[0];
-  return upcoming ? upcoming.due : "—";
-}
-function qs(sel,root=document){ return root.querySelector(sel); }
-function qsa(sel,root=document){ return [...root.querySelectorAll(sel)]; }
+const $ = (sel, root=document)=> root.querySelector(sel);
+function byDue(a,b){ return (a.due||'9999').localeCompare(b.due||'9999'); }
+function doneCount(p){ return p.tasks.filter(t=>t.done).length; }
+function nextDate(p){ const u=p.tasks.filter(t=>!t.done && t.due).sort(byDue)[0]; return u?u.due:'—'; }
 
-/* ---------- Rendering ---------- */
-const app = document.getElementById("app");
-
+/* ---------- Renderers ---------- */
 function renderHome(){
-  app.innerHTML = "";
-  state.phases.forEach(phase=>{
-    const done = phase.tasks.filter(t=>t.done).length;
-    const total = phase.tasks.length;
-    const next = fmtNextDue(phase.tasks);
-    const card = document.createElement("section");
-    card.className = "phase-card";
+  const v = $('#view'); v.innerHTML = '';
+  app.phases.forEach(p=>{
+    const card = document.createElement('section');
+    card.className = 'phase-card' + (app.ui.collapsed[p.id] ? ' collapsed' : '');
     card.innerHTML = `
       <div class="phase-head">
-        <div>
-          <h2 class="phase-title">${phase.title}</h2>
-          <div class="phase-meta">${done}/${total} complete • Next: ${next}</div>
-        </div>
-        <button class="icon-btn toggle" aria-expanded="false" data-id="${phase.id}">▼</button>
+        <h2 class="phase-title">${p.title}</h2>
+        <div class="counts">${doneCount(p)}/${p.tasks.length} complete</div>
       </div>
-      <div class="progress"><i style="width:${total? (done/total*100).toFixed(0) : 0}%"></i></div>
-      <div class="tasks" id="tasks-${phase.id}"></div>
+      <div class="progress"><span style="width:${p.tasks.length ? (doneCount(p)/p.tasks.length*100).toFixed(0):0}%"></span></div>
+      <div class="meta">Next: ${nextDate(p)}</div>
+      <div class="task-list"></div>
+      <div class="meta"><button class="pill small add-in-phase" data-phase="${p.id}">＋ Add Task</button></div>
     `;
-    app.appendChild(card);
-    // collapsed by default; no open class initially
-    renderTaskLists(phase);
+    const list = $('.task-list', card);
+    const active = p.tasks.filter(t=>!t.done).sort(byDue);
+    const completed = p.tasks.filter(t=>t.done).sort((a,b)=>(b.completedAt||0)-(a.completedAt||0));
+    if(active.length===0) list.appendChild(elEmpty('No active tasks.'));
+    else active.forEach(t=> list.appendChild(renderTaskRow(p,t)));
+    if(completed.length){
+      const sec=document.createElement('details');
+      const sum=document.createElement('summary'); sum.textContent = `Completed (${completed.length})`; sec.appendChild(sum);
+      const box=document.createElement('div');
+      completed.forEach(t=> box.appendChild(renderTaskRow(p,t)));
+      sec.appendChild(box); list.appendChild(sec);
+    }
+    // collapse toggle
+    card.querySelector('.phase-head').addEventListener('click',()=>{
+      app.ui.collapsed[p.id] = !app.ui.collapsed[p.id];
+      save(); card.classList.toggle('collapsed');
+    });
+    v.appendChild(card);
   });
 }
+function elEmpty(text){ const e=document.createElement('div'); e.className='empty'; e.textContent=text; return e; }
 
-function renderTaskLists(phase){
-  const container = document.getElementById("tasks-"+phase.id);
-  if(!container) return;
-  const active = phase.tasks.filter(t=>!t.done).sort(byDue);
-  const completed = phase.tasks.filter(t=>t.done).sort(byCompletedAtDesc);
-
-  const makeRow = (t)=>{
-    const row = document.createElement("div");
-    row.className = "task-row";
-    row.dataset.pid = phase.id; row.dataset.tid = t.id;
-    row.innerHTML = `
-      <div class="cb ${t.done?'checked':''}" role="checkbox" aria-checked="${t.done}">
-        <span class="tick">✓</span>
-      </div>
-      <div class="task-main">
-        <div class="task-title">${t.title}</div>
-        <div class="task-sub">${t.due? t.due : 'No date'}</div>
-      </div>
-      <div class="task-actions">
-        <button class="icon-btn expand" aria-label="Details">▾</button>
-        <button class="icon-btn del" aria-label="Delete">✕</button>
-      </div>
-    `;
-    const desc = document.createElement("div");
-    desc.className="desc";
-    desc.textContent = t.desc || "No additional details.";
-    return [row, desc];
-  };
-
-  const frag = document.createDocumentFragment();
-  // Active
-  const hA = document.createElement("div"); hA.className="section-title"; hA.textContent=`Active (${active.length})`;
-  frag.appendChild(hA);
-  active.forEach(t=>{ const [r,d]=makeRow(t); frag.appendChild(r); frag.appendChild(d); });
-  // Completed (collapsed by default)
-  const hC = document.createElement("div"); hC.className="section-title"; hC.textContent=`Completed (${completed.length})`;
-  hC.dataset.collapsed = "true";
-  frag.appendChild(hC);
-  const wrapC = document.createElement("div");
-  wrapC.style.display = "none";
-  completed.forEach(t=>{ const [r,d]=makeRow(t); frag.appendChild(wrapC); wrapC.appendChild(r); wrapC.appendChild(d); });
-  frag.appendChild(wrapC);
-
-  container.innerHTML = ""; // within phase container only
-  container.appendChild(frag);
+function renderTaskRow(phase, task){
+  const wrap=document.createElement('div');
+  const row = document.createElement('div');
+  row.className = 'task-row';
+  row.innerHTML = `
+    <button class="chk ${task.done?'done':''}" aria-label="toggle">${task.done?'✓':''}</button>
+    <div class="task-main">
+      <p class="task-title">${task.title}</p>
+      <div class="task-date">${task.due?('Due: '+task.due):'No date'}</div>
+    </div>
+    <div class="row-actions">
+      <button class="icon-btn expand" aria-label="expand">⌄</button>
+      <button class="icon-btn delete" aria-label="delete">🗑</button>
+    </div>
+  `;
+  const desc = document.createElement('div'); desc.className='task-desc'; desc.textContent = task.desc || '—';
+  // toggle complete
+  row.querySelector('.chk').addEventListener('click',()=>{
+    task.done = !task.done; task.completedAt = task.done ? Date.now() : null; save(); renderHome();
+  });
+  // expand
+  row.querySelector('.expand').addEventListener('click',()=>{ row.classList.toggle('expanded'); });
+  // delete
+  row.querySelector('.delete').addEventListener('click',()=>{
+    if(confirm(`Delete “${task.title}”?`)){
+      phase.tasks = phase.tasks.filter(t=>t.id!==task.id);
+      save(); renderHome();
+    }
+  });
+  wrap.appendChild(row); wrap.appendChild(desc); return wrap;
 }
 
-/* ---------- Timeline ---------- */
 function renderTimeline(){
-  app.innerHTML = `<h2 class="h1">Master Timeline</h2>`;
-  // Gather dated tasks
-  const items = [];
-  state.phases.forEach(p=>p.tasks.forEach(t=>{
-    if(t.due){ items.push({date:t.due, title:`${p.title}: ${t.title}`, phase:p.title}); }
-  }));
-  state.timeline.forEach(m=> items.push({date:m.date, title:m.title, phase:m.phase||""}));
-  items.sort((a,b)=>a.date.localeCompare(b.date));
-
-  // group by month
-  let lastMonth = "";
+  const v = $('#view'); v.innerHTML = '<h2 class="phase-title">Master Timeline</h2>';
+  // collect milestones + any task with a due date
+  const items = [...app.timeline.map(m=>({date:m.date,title:m.title}))];
+  app.phases.forEach(p=> p.tasks.forEach(t=>{ if(t.due){ items.push({date:t.due, title:`${p.title}: ${t.title}`}); }}));
+  items.sort((a,b)=> a.date.localeCompare(b.date));
+  // month headers
+  let cur='';
   items.forEach(it=>{
-    const month = new Date(it.date+"T00:00:00").toLocaleString(undefined,{month:'long',year:'numeric'});
-    if(month!==lastMonth){
-      const m = document.createElement("div"); m.className="month"; m.textContent = month; app.appendChild(m); lastMonth=month;
-    }
-    const card = document.createElement("div"); card.className="time-card";
-    card.innerHTML = `<div class="time-date">${it.date}</div><div>${it.title}</div>`;
-    app.appendChild(card);
+    const month = new Date(it.date+'T12:00:00').toLocaleString(undefined,{month:'long',year:'numeric'});
+    if(month!==cur){ cur=month; const h=document.createElement('h3'); h.className='phase-title'; h.textContent=month; v.appendChild(h); }
+    const r=document.createElement('div'); r.className='task-row'; r.innerHTML=`<div class="task-main"><p class="task-title">${it.title}</p><div class="task-date">${it.date}</div></div>`; v.appendChild(r);
   });
 }
 
-/* ---------- Events ---------- */
-document.getElementById("btnReset").addEventListener("click", ()=>{
-  if(confirm("Reset easyPCS to factory data?")){ localStorage.removeItem(LS_KEY); state = seedData(); renderHome(); }
-});
+/* ---------- Add Task modal ---------- */
+const modal = document.getElementById('addModal');
+const backdrop = document.getElementById('modalBackdrop');
+const addBtn = document.getElementById('addFab');
+const addForm = document.getElementById('addForm');
+const phaseSelect = document.getElementById('phaseSelect');
 
-document.getElementById("navHome").addEventListener("click", ()=>{ location.hash = "#/home"; });
-document.getElementById("navTimeline").addEventListener("click", ()=>{ location.hash = "#/timeline"; });
-document.getElementById("navAdd").addEventListener("click", ()=>{
-  alert("Add sheet coming in the next build. For now, expand a phase and manage tasks there.");
-});
-
-// expand/collapse phase tasks & task interactions using event delegation
-app.addEventListener("click",(e)=>{
-  const t = e.target;
-  // Toggle phase open
-  if(t.classList.contains("toggle")){
-    const id = t.dataset.id;
-    const box = document.getElementById("tasks-"+id);
-    if(!box) return;
-    const open = box.classList.toggle("open");
-    t.setAttribute("aria-expanded", open ? "true" : "false");
-    return;
-  }
-  // Completed section open/close
-  if(t.classList.contains("section-title")){
-    const next = t.nextElementSibling;
-    if(next && next.style){
-      const collapsed = next.style.display === "none";
-      next.style.display = collapsed ? "block" : "none";
-    }
-    return;
-  }
-  // Inside a task row
-  const row = t.closest(".task-row");
-  if(row){
-    const pid = row.dataset.pid; const tid = row.dataset.tid;
-    const phase = state.phases.find(p=>p.id===pid);
-    const task = phase?.tasks.find(x=>x.id===tid);
-    if(!task) return;
-
-    if(t.closest(".cb")){
-      task.done = !task.done;
-      task.completedAt = task.done ? Date.now() : null;
-      saveState();
-      renderHome(); // refresh counts & lists
-      return;
-    }
-    if(t.classList.contains("expand")){
-      row.classList.toggle("expanded");
-      return;
-    }
-    if(t.classList.contains("del")){
-      if(confirm("Delete this task?")){
-        phase.tasks = phase.tasks.filter(x=>x.id!==tid);
-        saveState();
-        renderHome();
-      }
-      return;
-    }
-  }
-});
-
-/* ---------- Router ---------- */
-function onRoute(){
-  ensureHomeRoute();
-  const h = location.hash;
-  if(h.startsWith("#/timeline")) renderTimeline();
-  else renderHome();
+function openAddModal(defaultPhaseId=null){
+  // fill phases
+  phaseSelect.innerHTML='';
+  app.phases.forEach(p=>{
+    const opt=document.createElement('option'); opt.value=p.id; opt.textContent=p.title;
+    if(defaultPhaseId && p.id===defaultPhaseId) opt.selected=true;
+    phaseSelect.appendChild(opt);
+  });
+  backdrop.classList.remove('hidden');
+  modal.classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  addForm.reset();
 }
-window.addEventListener("hashchange", onRoute);
-onRoute();
+function closeAddModal(){
+  backdrop.classList.add('hidden');
+  modal.classList.add('hidden');
+  document.body.style.overflow='';
+}
+addBtn.addEventListener('click', ()=> openAddModal(app.phases[0]?.id));
+document.querySelectorAll('.close-add').forEach(b=> b.addEventListener('click', closeAddModal));
+backdrop.addEventListener('click', closeAddModal);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !modal.classList.contains('hidden')) closeAddModal(); });
+
+// Add from phase-specific button
+document.addEventListener('click', (e)=>{
+  const add = e.target.closest('.add-in-phase');
+  if(add){ openAddModal(add.dataset.phase); }
+});
+
+addForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const fd = new FormData(addForm);
+  const title = (fd.get('title')||'').trim();
+  if(!title){ alert('Title is required'); return; }
+  const due = fd.get('due') || '';
+  const desc = fd.get('desc') || '';
+  const phaseId = fd.get('phase');
+  const phase = app.phases.find(p=>p.id===phaseId);
+  const id = `${phaseId}_${Date.now()}`;
+  phase.tasks.push({id, title, due, desc, done:false, completedAt:null});
+  save(); closeAddModal(); renderHome();
+});
+
+/* ---------- Global listeners: nav + reset ---------- */
+document.addEventListener('click',(e)=>{
+  const nav = e.target.closest('[data-route]');
+  if(nav){ location.hash = nav.getAttribute('data-route'); }
+  const isReset = e.target.closest('.reset-btn');
+  if(isReset){ if(confirm('Reset all data?')){ localStorage.removeItem(LS_KEY); app = seedData(); location.replace('#/home'); renderHome(); } }
+});
+
+/* ---------- Start ---------- */
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(!location.hash || location.hash==='#') location.replace('#/home');
+  route();
+});
