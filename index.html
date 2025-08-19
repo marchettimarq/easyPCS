@@ -1,26 +1,32 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>easyPCS</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <header class="app-header">
-      <h1 class="app-title">easy<span class="brand">PCS</span></h1>
-      <button id="resetBtn" class="reset" aria-label="Reset data">Reset</button>
-    </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>easyPCS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.png" sizes="512x512">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="easyPCS">
+  <style>html,body{height:100%;}</style>
+  <link rel="stylesheet" href="style.css?v=fix2">
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <h1 class="brand">easy<span>PCS</span></h1>
+    <button class="pill reset-btn" aria-label="Reset data">Reset</button>
+  </header>
 
-    <main id="app" aria-live="polite"></main>
+  <main id="view" role="main" aria-live="polite"></main>
 
-    <nav class="bottom-bar" role="navigation" aria-label="Primary">
-      <button id="navHome" class="nav-btn" aria-label="Home">🏠<span>Home</span></button>
-      <button id="navAdd" class="nav-btn primary" aria-label="Add">＋<span>Add</span></button>
-      <button id="navTimeline" class="nav-btn" aria-label="Timeline">⏱️<span>Timeline</span></button>
-    </nav>
+  <nav class="bottom-nav" role="navigation" aria-label="Primary">
+    <button class="nav-btn" data-route="#/home" aria-label="Home">🏠<span>Home</span></button>
+    <button id="addFab" class="nav-btn primary" aria-label="Add">＋</button>
+    <button class="nav-btn" data-route="#/timeline" aria-label="Timeline">⏱️<span>Timeline</span></button>
+  </nav>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="script.js?v=fix2"></script>
+</body>
 </html>
