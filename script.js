@@ -1,41 +1,120 @@
-// easyPCS localStorage demo with checkable tasks
-const KEY='easyPCS-demo-v1';
+// easyPCS — seeded v2 (4 phases, full task list) — vanilla JS + localStorage
+const KEY='easyPCS-seeded-v2';
 
-// Default in case nothing saved
-const seed = [
-  {id:'phase1', title:'Pre-PCS', tasks:[
-    {id:'t1', title:'Get orders', done:false},
-    {id:'t2', title:'Schedule HHG', done:false}
-  ]},
-  {id:'phase2', title:'PCS Move', tasks:[
-    {id:'t3', title:'Book travel', done:false}
-  ]},
-  {id:'phase3', title:'Post-PCS', tasks:[]}
-];
+// Seed object (id, title, tasks[])
+const seed = {
+  "phases": [
+    {
+      "id": "p1",
+      "title": "Pre‑Departure",
+      "tasks": [
+        "Complete Initial Assignment Briefing in vMPF (within 7 days of RIP)",
+        "Fill out and upload Assignment Information Worksheet",
+        "Verify dependents in DEERS / print DD 1172-2",
+        "Complete SOES/SGLI update in milConnect; print certified copy",
+        "Start Family Member Travel Screening (FMTS) and Initial Travel Screening Questionnaire (ITSQ)",
+        "Schedule/complete Immunizations Memo (86 MDG Immunizations)",
+        "Obtain Security Clearance Memorandum from unit Security Manager (SECRET required; validate in DISS)",
+        "Check if retainability is required → start process with CSS; obtain signed Retention memo",
+        "If dependents, complete DAF 965 Overseas Tour Election (only if required)",
+        "If TDY enroute, attach RIP + funding info",
+        "If carrying firearms, record POF details (Make/Model/Serial)",
+        "(Optional) Sign AOI Acknowledgement Memo",
+        "(Optional) Upload Assignment Worksheet, medical clearance initiation screenshot, DD1172-2",
+        "(Optional) Use AOI orders for HHG/Passenger Travel scheduling — cannot depart without amendment validating FMTS/security clearance",
+        "Decide whether to ship vehicle or sell vehicle",
+        "If shipping vehicle: collect title/registration/insurance; book POV shipment",
+        "If selling vehicle: list, bill of sale template, DMV paperwork",
+        "Book veterinarian appointments for 3 cats (check-ups + certificates)",
+        "Request pet health certificates (within airline window)",
+        "Book pet-friendly travel / airline pet reservations",
+        "Buy travel kennels & labels; verify airline dimensions"
+      ]
+    },
+    {
+      "id": "p2",
+      "title": "Mid Prep",
+      "tasks": [
+        "VIPER Folder – upload all required docs; CSS marks ‘In Person Final Out Ready – Submitted to MPF.’",
+        "Relocation Processing Memorandum",
+        "Weapons training current (AF 522 if required)",
+        "Security debrief / badge turn‑in",
+        "Family Care Plan (AF 357) if single parent/mil‑to‑mil",
+        "GTC active / mission‑critical",
+        "AT/FP Brief (not required CONUS)",
+        "Fitness file closed/hand‑carried if applicable",
+        "Route for CC/DO/CCF/First Sgt signature",
+        "Virtual Outprocessing (vMPF) – complete all items except Outbound Assignments",
+        "Physical Fitness valid through 2026‑01‑31 (retest if due)",
+        "Orders Review – dependents, RNLTD, remarks",
+        "Household Goods (TMO) – after orders/AOI, schedule pack‑out",
+        "If traveling different routing: submit Circuitous Travel Memo",
+        "Reserve lodging (TLF/Hotel) at Hill AFB ahead of house‑hunting",
+        "Confirm pet‑friendly lodging / temporary housing",
+        "Arrange mail forwarding & address change plan"
+      ]
+    },
+    {
+      "id": "p3",
+      "title": "Final Out",
+      "tasks": [
+        "CSS Outprocessing – 1 duty day before MPF",
+        "Final Out Appointment (MPF) – WaitWhile; bring all docs (Orders, Certified SOES/SGLI, 2× Relocation Memos, vOP Checklist, Immunizations Memo, Security Clearance Memo)",
+        "Port Call (Passenger Travel) – upload orders to PTA, confirm flight",
+        "Finance Outprocessing (CPTS) – DLA, travel voucher, GTC usage",
+        "Confirm HHG pack/pickup dates; inventory photos",
+        "Confirm pet travel bookings and crate drop‑off instructions",
+        "Return GTC receipts organized for voucher"
+      ]
+    },
+    {
+      "id": "p4",
+      "title": "Arrival (Hill AFB)",
+      "tasks": [
+        "Report to unit CSS within 24 hrs",
+        "In‑process Finance (update BAH, COLA, etc.)",
+        "In‑process Medical at Hill AFB Clinic",
+        "Update DEERS/Tricare with new address",
+        "Secure housing (on/off base)",
+        "School/childcare enrollment for dependents",
+        "Pick up POV or complete vehicle purchase/registration",
+        "Register pets per base/state guidance; establish new vet",
+        "Set up utilities; update driver’s license/address",
+        "File final travel voucher if pending"
+      ]
+    }
+  ]
+};
+
+// Convert to runtime structure with task ids
+function expandedSeed() {
+  const withIds = structuredClone(seed);
+  withIds.phases.forEach((p) => {
+    p.tasks = p.tasks.map((t, j) => ({ id: `${p.id}-t${j+1}`, title: t, done: false }));
+  });
+  return withIds.phases;
+}
 
 function load(){
   try{
     const raw = localStorage.getItem(KEY);
-    if(!raw) return seed;
-    const data = JSON.parse(raw);
-    if(!Array.isArray(data)) return seed;
-    return data;
-  }catch(e){ console.warn('Storage error, using seed', e); return seed; }
+    if(!raw) return expandedSeed();
+    const parsed = JSON.parse(raw);
+    return parsed && Array.isArray(parsed) ? parsed : expandedSeed();
+  }catch(e){ console.warn('Storage error, using seed', e); return expandedSeed(); }
 }
-let phases = load();
 
+let phases = load();
 const save = (()=>{ let t; return ()=>{ clearTimeout(t); t=setTimeout(()=>{
   try{ localStorage.setItem(KEY, JSON.stringify(phases)); }catch(e){ console.warn('Persist failed', e); }
-}, 150); };})();
+}, 180); };})();
 
 const $ = (s, r=document)=>r.querySelector(s);
-const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
-
 const phasesEl = $("#phases");
 const phaseTpl = $("#phaseTpl");
 const taskTpl = $("#taskTpl");
 
-// Render all
+// Render all phases and tasks
 function render(){
   phasesEl.innerHTML='';
   phases.forEach(p=>{
@@ -44,9 +123,10 @@ function render(){
     $(".phase-title", node).textContent = p.title;
     const ul = $(".task-list", node);
 
-    // metrics
-    $(".total", node).textContent = p.tasks.length;
-    $(".done", node).textContent = p.tasks.filter(t=>t.done).length;
+    const total = p.tasks.length;
+    const doneCount = p.tasks.filter(t=>t.done).length;
+    $(".total", node).textContent = total;
+    $(".done", node).textContent = doneCount;
 
     p.tasks.forEach(t=>{
       const li = taskTpl.content.firstElementChild.cloneNode(true);
@@ -61,7 +141,7 @@ function render(){
 }
 render();
 
-// Delegated events
+// Delegated events for add/delete/toggle/edit
 phasesEl.addEventListener('click', (e)=>{
   const del = e.target.closest('.delete');
   const addBtn = e.target.closest('.add-task');
@@ -72,7 +152,7 @@ phasesEl.addEventListener('click', (e)=>{
     const card = e.target.closest('.phase-card');
     const id = card.dataset.phaseId;
     const input = card.querySelector('.add-input');
-    const title = (input.value||'').trim().slice(0,60);
+    const title = (input.value||'').trim().slice(0,120);
     if(!title){ input.focus(); return; }
     const p = phases.find(x=>x.id===id);
     p.tasks.push({id:'t'+Date.now(), title, done:false});
@@ -109,7 +189,7 @@ phasesEl.addEventListener('blur', (e)=>{
   if(e.target.classList.contains('phase-title')){
     const card = e.target.closest('.phase-card');
     const p = phases.find(x=>x.id===card.dataset.phaseId);
-    const v = (e.target.textContent||'').trim().slice(0,40) || 'Untitled';
+    const v = (e.target.textContent||'').trim().slice(0,60) || 'Untitled';
     if(p.title!==v){ p.title=v; save(); render(); }
   }
   // task title
@@ -118,14 +198,14 @@ phasesEl.addEventListener('blur', (e)=>{
     const card = e.target.closest('.phase-card');
     const p = phases.find(x=>x.id===card.dataset.phaseId);
     const t = p.tasks.find(x=>x.id===li.dataset.taskId);
-    const v = (e.target.textContent||'').trim().slice(0,80) || 'Untitled task';
+    const v = (e.target.textContent||'').trim().slice(0,160) || 'Untitled task';
     if(t.title!==v){ t.title=v; save(); render(); }
   }
 }, true);
 
 // Reset
-$("#resetBtn").addEventListener('click', ()=>{
-  if(!confirm('Reset demo data?')) return;
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(!confirm('Reset to full PCS seed?')) return;
   localStorage.removeItem(KEY);
   phases = load();
   render();

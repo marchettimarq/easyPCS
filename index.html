@@ -3,40 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>easyPCS — LS demo</title>
+  <title>easyPCS — PCS Checklist</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
     <strong class="brand">easyPCS</strong>
     <span class="grow"></span>
-    <button id="resetBtn" class="btn outline">Reset</button>
+    <button id="resetBtn" class="btn outline" type="button" aria-label="Reset data">Reset</button>
   </header>
 
   <main id="phases" class="phases" aria-live="polite"></main>
 
   <template id="phaseTpl">
-    <section class="phase-card">
+    <section class="phase-card" role="region" aria-label="Phase">
       <div class="phase-head">
-        <h3 class="phase-title" contenteditable="true"></h3>
+        <h3 class="phase-title" contenteditable="true" aria-label="Edit phase title"></h3>
         <div class="metrics"><span class="done"></span>/<span class="total"></span> complete</div>
       </div>
-      <ul class="task-list"></ul>
+      <ul class="task-list" aria-label="Tasks"></ul>
       <div class="add-row">
         <input class="add-input" type="text" inputmode="text" placeholder="Add task…">
-        <button class="btn add-task">Add</button>
+        <button class="btn add-task" type="button">Add</button>
       </div>
     </section>
   </template>
 
   <template id="taskTpl">
     <li class="task-row">
-      <label class="check">
+      <label class="check" aria-label="Toggle complete">
         <input type="checkbox" aria-label="Complete task">
         <span class="dot"></span>
       </label>
-      <div class="task-title" contenteditable="true"></div>
-      <button class="delete" aria-label="Delete">×</button>
+      <div class="task-title" contenteditable="true" aria-label="Edit task title"></div>
+      <button class="delete" aria-label="Delete task">×</button>
     </li>
   </template>
 
