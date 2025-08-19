@@ -1,44 +1,132 @@
-// script.js (minimal harness) — proves JS loads and DOM wiring works
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("script.js loaded");
+// easyPCS localStorage demo with checkable tasks
+const KEY='easyPCS-demo-v1';
 
-  const phasesContainer = document.getElementById("phases");
-  const addPhaseBtn = document.getElementById("addPhaseBtn");
+// Default in case nothing saved
+const seed = [
+  {id:'phase1', title:'Pre-PCS', tasks:[
+    {id:'t1', title:'Get orders', done:false},
+    {id:'t2', title:'Schedule HHG', done:false}
+  ]},
+  {id:'phase2', title:'PCS Move', tasks:[
+    {id:'t3', title:'Book travel', done:false}
+  ]},
+  {id:'phase3', title:'Post-PCS', tasks:[]}
+];
 
-  if (!phasesContainer) {
-    console.error("No #phases container found");
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return seed;
+    const data = JSON.parse(raw);
+    if(!Array.isArray(data)) return seed;
+    return data;
+  }catch(e){ console.warn('Storage error, using seed', e); return seed; }
+}
+let phases = load();
+
+const save = (()=>{ let t; return ()=>{ clearTimeout(t); t=setTimeout(()=>{
+  try{ localStorage.setItem(KEY, JSON.stringify(phases)); }catch(e){ console.warn('Persist failed', e); }
+}, 150); };})();
+
+const $ = (s, r=document)=>r.querySelector(s);
+const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+
+const phasesEl = $("#phases");
+const phaseTpl = $("#phaseTpl");
+const taskTpl = $("#taskTpl");
+
+// Render all
+function render(){
+  phasesEl.innerHTML='';
+  phases.forEach(p=>{
+    const node = phaseTpl.content.firstElementChild.cloneNode(true);
+    node.dataset.phaseId = p.id;
+    $(".phase-title", node).textContent = p.title;
+    const ul = $(".task-list", node);
+
+    // metrics
+    $(".total", node).textContent = p.tasks.length;
+    $(".done", node).textContent = p.tasks.filter(t=>t.done).length;
+
+    p.tasks.forEach(t=>{
+      const li = taskTpl.content.firstElementChild.cloneNode(true);
+      li.dataset.taskId = t.id;
+      $(".task-title", li).textContent = t.title;
+      $(".check input", li).checked = !!t.done;
+      ul.appendChild(li);
+    });
+
+    phasesEl.appendChild(node);
+  });
+}
+render();
+
+// Delegated events
+phasesEl.addEventListener('click', (e)=>{
+  const del = e.target.closest('.delete');
+  const addBtn = e.target.closest('.add-task');
+  const check = e.target.closest('.check input');
+
+  // Add task
+  if(addBtn){
+    const card = e.target.closest('.phase-card');
+    const id = card.dataset.phaseId;
+    const input = card.querySelector('.add-input');
+    const title = (input.value||'').trim().slice(0,60);
+    if(!title){ input.focus(); return; }
+    const p = phases.find(x=>x.id===id);
+    p.tasks.push({id:'t'+Date.now(), title, done:false});
+    input.value='';
+    save(); render();
     return;
   }
 
-  function createPhaseCard(title = "New Phase") {
-    const card = document.createElement("div");
-    card.className = "phase-card";
-    card.innerHTML = `
-      <h3 contenteditable="true" role="textbox" aria-label="Phase title">${title}</h3>
-      <ul class="task-list" aria-label="Tasks"></ul>
-      <button class="add-task-btn btn" type="button">+ Add Task</button>
-    `;
-
-    card.querySelector(".add-task-btn").addEventListener("click", () => {
-      const taskText = prompt("Enter task name:");
-      if (taskText) {
-        const li = document.createElement("li");
-        li.textContent = taskText;
-        card.querySelector(".task-list").appendChild(li);
-      }
-    });
-
-    return card;
+  // Delete task
+  if(del){
+    const li = del.closest('.task-row');
+    const card = del.closest('.phase-card');
+    const p = phases.find(x=>x.id===card.dataset.phaseId);
+    p.tasks = p.tasks.filter(t=>t.id!==li.dataset.taskId);
+    save(); render();
+    return;
   }
 
-  // Starter phases so you immediately see content on load
-  const defaultPhases = ["Pre-PCS", "PCS Move", "Post-PCS"];
-  defaultPhases.forEach(name => phasesContainer.appendChild(createPhaseCard(name)));
-
-  if (addPhaseBtn) {
-    addPhaseBtn.addEventListener("click", () => {
-      const name = prompt("Enter phase name:");
-      if (name) phasesContainer.appendChild(createPhaseCard(name));
-    });
+  // Toggle checkbox
+  if(check){
+    const li = check.closest('.task-row');
+    const card = check.closest('.phase-card');
+    const p = phases.find(x=>x.id===card.dataset.phaseId);
+    const t = p.tasks.find(x=>x.id===li.dataset.taskId);
+    t.done = check.checked;
+    save(); render();
+    return;
   }
+});
+
+// Inline edits
+phasesEl.addEventListener('blur', (e)=>{
+  // phase title
+  if(e.target.classList.contains('phase-title')){
+    const card = e.target.closest('.phase-card');
+    const p = phases.find(x=>x.id===card.dataset.phaseId);
+    const v = (e.target.textContent||'').trim().slice(0,40) || 'Untitled';
+    if(p.title!==v){ p.title=v; save(); render(); }
+  }
+  // task title
+  if(e.target.classList.contains('task-title')){
+    const li = e.target.closest('.task-row');
+    const card = e.target.closest('.phase-card');
+    const p = phases.find(x=>x.id===card.dataset.phaseId);
+    const t = p.tasks.find(x=>x.id===li.dataset.taskId);
+    const v = (e.target.textContent||'').trim().slice(0,80) || 'Untitled task';
+    if(t.title!==v){ t.title=v; save(); render(); }
+  }
+}, true);
+
+// Reset
+$("#resetBtn").addEventListener('click', ()=>{
+  if(!confirm('Reset demo data?')) return;
+  localStorage.removeItem(KEY);
+  phases = load();
+  render();
 });

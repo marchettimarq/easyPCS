@@ -3,42 +3,49 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>easyPCS — Test Harness</title>
-  <style>
-    :root{--bg:#0b1020;--card:#121a2c;--text:#e6eaf5;--muted:#9aa7c7;--border:#20283a;--brand:#2f6bff;}
-    *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
-    header,footer{position:sticky;left:0;right:0;background:var(--card);padding:12px 16px;z-index:2;border-bottom:1px solid var(--border)}
-    header{top:0}
-    footer{bottom:0;border-top:1px solid var(--border);border-bottom:none}
-    .bar{display:flex;align-items:center;gap:12px}
-    .grow{flex:1}
-    #phases{padding:16px;display:grid;grid-template-columns:1fr;gap:12px}
-    .phase-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
-    .phase-card h3{margin:0 0 8px;font-size:16px}
-    .task-list{margin:0;padding-left:18px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:var(--brand);color:#fff;font-weight:600}
-    .add-task-btn{margin-top:8px}
-    .notice{padding:12px 16px;background:#101628;border-top:1px solid var(--border);color:var(--muted);text-align:center}
-  </style>
+  <title>easyPCS — LS demo</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="bar">
-      <strong>easyPCS (test)</strong>
-      <span class="grow"></span>
-      <button id="addPhaseBtn" class="btn" type="button">+ Add Phase</button>
-    </div>
+  <header class="topbar">
+    <strong class="brand">easyPCS</strong>
+    <span class="grow"></span>
+    <button id="resetBtn" class="btn outline">Reset</button>
   </header>
 
-  <main id="phases" aria-live="polite"></main>
-  <div class="notice">This is a minimal test page to verify <code>script.js</code> runs.</div>
+  <main id="phases" class="phases" aria-live="polite"></main>
 
-  <footer>
-    <div class="bar"><span class="grow"></span><small>Footer placeholder</small><span class="grow"></span></div>
+  <template id="phaseTpl">
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3 class="phase-title" contenteditable="true"></h3>
+        <div class="metrics"><span class="done"></span>/<span class="total"></span> complete</div>
+      </div>
+      <ul class="task-list"></ul>
+      <div class="add-row">
+        <input class="add-input" type="text" inputmode="text" placeholder="Add task…">
+        <button class="btn add-task">Add</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="taskTpl">
+    <li class="task-row">
+      <label class="check">
+        <input type="checkbox" aria-label="Complete task">
+        <span class="dot"></span>
+      </label>
+      <div class="task-title" contenteditable="true"></div>
+      <button class="delete" aria-label="Delete">×</button>
+    </li>
+  </template>
+
+  <footer class="bottombar">
+    <button class="nav" disabled>Home</button>
+    <button class="nav primary" disabled>＋</button>
+    <button class="nav" disabled>Timeline</button>
   </footer>
 
-  <!-- Make sure this script tag is at the very end of body -->
   <script src="script.js"></script>
 </body>
 </html>
